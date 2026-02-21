@@ -35,44 +35,46 @@
         </header>
 
         <div class="post-content fade-up delay-1">
-            <p>One of the biggest challenges in AI agents today is interacting with graphical user interfaces. While
-                APIs are well-structured and easy for an LLM to digest, the visual web is chaotic. I recently set out to
-                build a browser subagent capable of independently navigating websites, filling out forms, and verifying
-                visual state.</p>
+            <p>One of the biggest challenges in AI companions today is continuity. Most chatbots are stateless: each
+                turn starts from scratch. I wanted an agent that could run 24/7, remember in a meaningful way, and keep
+                an internal sense of self—so I built Milo: it lives on a Raspberry Pi, talks over Telegram, and grounds
+                every reply in semantic memory and ongoing state.</p>
 
             <h2>The Architecture</h2>
-            <p>The core of the system relies on a loop of visually aware reasoning. Instead of just passing the HTML DOM
-                to the model (which is often bloated and missing visual context), the subagent takes a screenshot,
-                processes the bounding boxes of clickable elements, and maps them to a simplified interaction tree.</p>
+            <p>The core of the system is a loop of memory-aware reasoning. Instead of feeding the LLM only the latest
+                message, the sentinel pulls relevant past experience from ChromaDB (RAG over embedded memories),
+                combines it with current hormonal state, self-model, and context (hardware, time of day, recent
+                transcript), and builds a single prompt. The model replies; that exchange is witnessed back into memory
+                and state.</p>
 
-            <pre><code>def agent_step(state):
-    screenshot = browser.capture_viewport()
-    dom_nodes = browser.extract_interactive_elements()
-    
-    # Prune non-visible elements
-    visible_nodes = prune_tree(dom_nodes, screenshot)
-    
-    action = llm.predict(
-        prompt=SYSTEM_PROMPT, 
-        image=screenshot, 
-        context=visible_nodes
+            <pre><code>def process_signal(sender, subject, body):
+    context = memory.mood_biased_recall(base_query=body)
+    prompt = build_reply_prompt(
+        body=body,
+        memory_context=context,
+        hormones=state["hormones"],
+        self_model=load_self_model(),
     )
+    response = llm.invoke([SystemMessage(content=prompt), HumanMessage(content=body)])
+    res = parse_tags(response.content)
     
-    return execute_action(action)</code></pre>
+    memory.witness(res["CORE_UPDATE"], res["FUTURE_MESSAGE"], body, res["REPLY"])
+    dispatch_as_human(res["REPLY"])
+    return</code></pre>
 
-            <h2>Handling Dynamic Content</h2>
-            <p>The trickiest part was dealing with React applications where elements are constantly unmounting and
-                remounting. A simple ID-based click would fail if the DOM rapidly updated. To solve this, I implemented
-                an "element anchoring" system that relies on visual proximity and text matching rather than strict CSS
-                selectors.</p>
+            <h2>Handling State Over Time</h2>
+            <p>The trickiest part was keeping context useful without blowing the prompt. A naive “dump all memories”
+                approach would hit token limits and dilute what mattered. To fix that, I added mood-biased recall (the
+                query to ChromaDB is shaped by current emotional state), a strict character budget for memory context,
+                and a split between “recent & relevant” and “sacred” memories so the model always sees a few anchors
+                plus the most pertinent thread.</p>
 
             <h3>Key Takeaways</h3>
-            <p>Building this taught me that the future of UI agents is fundamentally visual. We cannot rely purely on
-                the underlying code structure when the user experience is entirely graphical. By fusing multimodal
-                vision models with precise DOM tooling, we get the best of both worlds.</p>
-
-            <p>In the next post, I'll dive into how I run this agent head-less in a Docker container for CI/CD
-                integrations.</p>
+            <p>Building this taught me that the future of companions is continuous and stateful. We can’t rely on
+                stateless turns when the goal is something that feels like one ongoing presence. By combining RAG over
+                lived experience with explicit state (hormones, self-model, transcript) and a single long-running
+                process, we get replies that are grounded in what actually happened—not just the last message in the
+                chat.</p>
         </div>
     </article>
 
