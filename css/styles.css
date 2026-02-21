@@ -37,15 +37,21 @@ h6 {
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   line-height: 1.2;
+  color: var(--text-primary);
 }
 
 a {
-  color: var(--text-primary);
+  color: var(--accent-color);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 a:hover {
+  color: #4f46e5;
+  /* Slightly darker indigo */
+}
+
+strong {
   color: var(--accent-color);
 }
 
@@ -85,6 +91,7 @@ nav .logo {
   font-weight: 500;
   font-size: 1rem;
   position: relative;
+  color: var(--text-primary);
 }
 
 .nav-links a::after {
@@ -94,8 +101,13 @@ nav .logo {
   height: 2px;
   bottom: -4px;
   left: 0;
-  background: var(--accent-gradient);
+  background: var(--accent-color);
   transition: width 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--accent-color);
 }
 
 .nav-links a:hover::after,
