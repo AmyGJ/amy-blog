@@ -80,6 +80,16 @@ nav .logo {
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent-color), #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+nav .logo:hover {
+  transform: scale(1.05);
 }
 
 .nav-links {
