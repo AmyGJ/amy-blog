@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building an Autonomous Browser Subagent | Amy.ai</title>
+    <meta name="description" content="How I architected an AI agent capable of navigating the web.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Amy<span class="gradient-text">.ai</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#projects" class="active">Projects</a>
+            <a href="about.html">About</a>
+        </div>
+    </nav>
+
+    <article class="post-container">
+        <header class="post-header fade-up">
+            <div
+                style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                Project Dive</div>
+            <h1 class="post-title">Building an Autonomous Browser Subagent</h1>
+            <div class="post-meta">
+                <span>By Amy Jerkovich</span>
+                <span>•</span>
+                <span>Feb 18, 2026</span>
+                <span>•</span>
+                <span>12 min read</span>
+            </div>
+        </header>
+
+        <div class="post-content fade-up delay-1">
+            <p>One of the biggest challenges in AI agents today is interacting with graphical user interfaces. While
+                APIs are well-structured and easy for an LLM to digest, the visual web is chaotic. I recently set out to
+                build a browser subagent capable of independently navigating websites, filling out forms, and verifying
+                visual state.</p>
+
+            <h2>The Architecture</h2>
+            <p>The core of the system relies on a loop of visually aware reasoning. Instead of just passing the HTML DOM
+                to the model (which is often bloated and missing visual context), the subagent takes a screenshot,
+                processes the bounding boxes of clickable elements, and maps them to a simplified interaction tree.</p>
+
+            <pre><code>def agent_step(state):
+    screenshot = browser.capture_viewport()
+    dom_nodes = browser.extract_interactive_elements()
+    
+    # Prune non-visible elements
+    visible_nodes = prune_tree(dom_nodes, screenshot)
+    
+    action = llm.predict(
+        prompt=SYSTEM_PROMPT, 
+        image=screenshot, 
+        context=visible_nodes
+    )
+    
+    return execute_action(action)</code></pre>
+
+            <h2>Handling Dynamic Content</h2>
+            <p>The trickiest part was dealing with React applications where elements are constantly unmounting and
+                remounting. A simple ID-based click would fail if the DOM rapidly updated. To solve this, I implemented
+                an "element anchoring" system that relies on visual proximity and text matching rather than strict CSS
+                selectors.</p>
+
+            <h3>Key Takeaways</h3>
+            <p>Building this taught me that the future of UI agents is fundamentally visual. We cannot rely purely on
+                the underlying code structure when the user experience is entirely graphical. By fusing multimodal
+                vision models with precise DOM tooling, we get the best of both worlds.</p>
+
+            <p>In the next post, I'll dive into how I run this agent head-less in a Docker container for CI/CD
+                integrations.</p>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

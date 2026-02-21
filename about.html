@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Amy Jerkovich</title>
+    <meta name="description" content="About Amy Jerkovich, a software engineer building AI agents.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .about-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: start;
+            max-width: 1000px;
+            margin: 8rem auto;
+            padding: 0 5%;
+        }
+
+        .about-image {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            background: var(--surface-color);
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--surface-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Gradient glow behind image */
+        .about-image::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            background: var(--accent-gradient);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.5;
+        }
+
+        .about-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-content p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .about-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Amy<span class="gradient-text">.ai</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#projects">Projects</a>
+            <a href="about.html" class="active">About</a>
+        </div>
+    </nav>
+
+    <div class="about-layout">
+        <!-- We will generate an image here -->
+        <img class="about-image fade-up" src="assets/profile.jpg" alt="Amy Jerkovich"
+            style="display: block; object-fit: cover;">
+        <div class="about-content fade-up delay-1">
+            <h1>Hi, I'm <span class="gradient-text">Amy</span>.</h1>
+            <p>I am a software engineer deeply fascinated by artificial intelligence, specifically the emerging field of
+                autonomous agents.</p>
+            <p>My work involves taking raw LLM capabilities and wrapping them in robust architectures with tools,
+                memory, and reasoning loops to solve complex real-world problems. Whether it's a subagent navigating the
+                DOM, or a multi-agent system debating code structure, I am obsessed with pushing the boundaries of what
+                AI can automate.</p>
+            <p>When I'm not tweaking system prompts or fine-tuning models, you can find me writing about my discoveries
+                right here on this blog.</p>
+
+            <h2 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-primary);">Core Stack</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <span
+                    style="background: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--surface-border);">Python</span>
+                <span
+                    style="background: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--surface-border);">Flask</span>
+                <span
+                    style="background: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--surface-border);">LangChain</span>
+                <span
+                    style="background: var(--surface-color); padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--surface-border);">LLM
+                    Ops</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
