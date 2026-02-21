@@ -166,6 +166,7 @@ nav .logo:hover {
 /* Section */
 section {
   padding: 5rem 5%;
+  scroll-margin-top: 6rem;
 }
 
 .section-title {
