@@ -279,6 +279,16 @@ section {
   margin-bottom: 1.5rem;
 }
 
+.post-content ul,
+.post-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.post-content li {
+  margin-bottom: 0.75rem;
+}
+
 .post-content pre {
   background: #f3f4f6;
   border: 1px solid var(--surface-border);
