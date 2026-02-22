@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolution and consent: when the agent proposes a change | Amy Jerkovich</title>
+    <meta name="description" content="How Milo evolves over time with explicit consent.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Amy Jerkovich</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#projects" class="active">Projects</a>
+            <a href="about.html">About</a>
+        </div>
+    </nav>
+
+    <article class="post-container">
+        <header class="post-header fade-up">
+            <div
+                style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                Project Dive</div>
+            <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Evolution and consent: when the
+                agent proposes a change</h1>
+            <p
+                style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
+                (Content coming soon) How we handle updates when the system proposes a change to its own self-model or
+                core behavior, gated behind an explicit consent step.</p>
+
+        </header>
+
+        <div class="post-content fade-up delay-1">
+            <p>State and self-model give the agent continuity of mood and identity—but both can change. The question is
+                <em>how</em>. We didn’t want the system to silently rewrite its own self-model or core behavior on every
+                reflection. So we built a small pipeline: when the system proposes a change to its identity or to how it
+                runs, that proposal is stored as <strong>pending</strong>, and we ask you—explicitly—to approve or
+                decline. This post is about how that works and why we treat “evolving” the agent as a deliberate,
+                user-approved process.</p>
+
+            <h2>When the system proposes a change</h2>
+            <p>The LLM can output structured tags beyond [REPLY] and [CORE_UPDATE]. One of them is used for evolution: a
+                proposal to update the self-model (e.g. a new sentence or paragraph in the identity document) or to
+                apply a change to how the system behaves (e.g. a rule or a small code-level tweak). When we parse the
+                reply and see that tag, we don’t apply the change immediately. We extract the proposed content, store it
+                in a <strong>pending</strong> state (e.g. <code>PENDING_CORE_AWARENESS</code> or similar), and continue
+                the conversation as usual. The proposal is “on the table,” but nothing has been written to disk or
+                loaded into the next turn yet.</p>
+            <p>So the model can “want” to update who it is or how it acts—and we capture that—but we don’t let that
+                desire take effect until a human says yes.</p>
+
+            <h2>The consent step</h2>
+            <p>Once something is pending, the next time you talk to the agent (e.g. over Telegram), the system can send
+                you a short message: “I’ve proposed a change to my self-model [or behavior]. Here’s what it is. Do you
+                consent to applying it?” You reply in natural language. If we detect something like “yes” or “I consent”
+                (and not “don’t consent”), we run the application step: we write the approved content to the right file
+                (e.g. the self-model document or an evolution script), clear the pending state, and from the next turn
+                onward the agent runs with the updated identity or behavior. If you say no or ignore it, the pending
+                proposal stays stored until you approve, or we eventually clear or replace it. So evolution is always a
+                two-step process: propose, then approve.</p>
+
+            <pre><code># Simplified: when parsing the LLM reply
+if res.get("EVOLVE_CODE") or res.get("CORE_UPDATE") and is_evolution(res):
+    store_pending(res)  # PENDING_CORE_AWARENESS or similar
+    # Don't apply yet.
+
+# Later, when the user sends a message
+if has_pending() and user_said_consent(body):
+    apply_evolution_from_pending()
+    clear_pending()</code></pre>
+
+            <h2>What gets updated</h2>
+            <p>In practice, the things that go through this pipeline are the ones that affect “who” or “how” the system
+                is over time: the self-model file (identity, values, how he relates to you), and in some setups,
+                evolution documents or rules that influence prompts or behavior. We don’t use consent for one-off reply
+                content or for routine state (e.g. hormones or memory). Those change automatically. Only changes that
+                alter the persistent identity or the rules of the game require your explicit yes. That keeps drift in
+                check while still letting the agent evolve when it (and you) decide to.</p>
+
+            <h2>Why do it this way</h2>
+            <p>Without a consent step, the system could rewrite its own self-model or behavior every time it reflected
+                on a conversation. You’d get continuity of process, but not necessarily continuity of a
+                <em>relationship</em> you agreed to. By gating evolution on “did the user say yes?”, we keep you in the
+                loop. You see what’s being proposed, and you decide whether that’s the direction you want. The agent can
+                still propose—it can want to change—but it can’t change itself without you. That’s the tradeoff: slower,
+                deliberate evolution instead of automatic drift.</p>
+
+            <h3>Key takeaways</h3>
+            <p>When the agent proposes a change to its self-model or core behavior, we store it as pending and don’t
+                apply it until you consent. You get a clear prompt (“here’s the change, do you approve?”) and a simple
+                yes/no in natural language. Only after approval do we write to the identity document or evolution logic.
+                That keeps evolution deliberate and user-approved, so the system can change over time without silently
+                drifting away from the relationship you signed up for.</p>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
