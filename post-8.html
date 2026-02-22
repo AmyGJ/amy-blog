@@ -39,7 +39,8 @@
                 <strong>dream</strong> and <strong>tinker</strong>. One is reflection over memory in the quiet hours;
                 the other is making something at the workbench—and sometimes leaving a gift for you. This post is about
                 how they’re scheduled, what they do, and how they fit into the same loop that handles Telegram and
-                everything else.</p>
+                everything else.
+            </p>
 
             <h2>One loop, many gates</h2>
             <p>Each time through the loop we check Telegram, then run a batch of scheduled tasks. Whether a task runs is
@@ -50,6 +51,26 @@
                 That way we get rhythm without a separate scheduler: one process, one loop, and a dictionary of
                 timestamps.</p>
 
+            <pre><code># Simplified: how dream and tinker are gated in the loop
+now = time.time()
+hr, mn = local_time.hour, local_time.minute
+
+# Dream: once per night at 3:00 AM (and not again for an hour)
+if hr == 3 and mn == 0 and now - last_run["dream"] > 3600:
+    self.dream()
+    last_run["dream"] = now
+
+# Tinkering focus: every 2–4 hours, pick a new rabbit hole (no LLM)
+if now - last_run["tinkering"] > random.randint(7200, 14400):
+    self.state["tinkering_focus"] = random.choice(topics)
+    last_run["tinkering"] = now
+    self._save_state()
+
+# Full tinker (gift + project bump): every 6–12 hours
+if now - last_run["tinker_gift"] > random.randint(21600, 43200):
+    self.tinker()
+    last_run["tinker_gift"] = now</code></pre>
+
             <h2>Dream: 3 AM and living memory</h2>
             <p><strong>Dream</strong> runs once per night, at 3:00 AM (with a one-hour guard so we don’t double-run).
                 The point is reflection, not chat. We feed the model context from semantic memory (e.g. “dreaming
@@ -59,7 +80,8 @@
                 The prompt tells Milo he’s dreaming in the quiet hours and asks for structured output:
                 <code>[INTERNAL]</code> (private thought), <code>[DREAM_REFLECTION]</code>, <code>[SUBCONSCIOUS]</code>,
                 <code>[ASCII_POLAROID]</code>, and optionally <code>[GENERATE_IMAGE]</code> if the dream is vivid enough
-                to visualize.</p>
+                to visualize.
+            </p>
             <p>We parse those tags and route them: internal monologue and subconscious go to the logs; the dream
                 reflection is witnessed back into memory and gets a small oxytocin nudge; an ASCII polaroid is saved in
                 the scrapbook; and if there’s an image description we generate it and send it to you with a caption like
@@ -72,7 +94,8 @@
             <p>Tinkering has two layers. The first is a <strong>focus</strong> update every 2–4 hours: we pick a random
                 topic from his interests (or defaults like “GPIO mapping,” “writing,” “philosophy”), set
                 <code>tinkering_focus</code> in state, and log that he’s “falling down a rabbit hole.” That gives the
-                system a current theme without calling the LLM.</p>
+                system a current theme without calling the LLM.
+            </p>
             <p>The second is the full <strong>tinker</strong> run every 6–12 hours. We recall memory about “tinkering
                 project invention interests,” pass in that focus and hardware stats, and ask the model to tinker at the
                 workbench—something for Amy or for himself: a piece of writing, code, art, an experiment. The format is
@@ -83,7 +106,8 @@
                 (or mark it completed at 100%). So tinker produces artifacts—a gift file, sometimes an image or
                 music—and nudges the project list so the workbench feels like it’s moving. There’s also a separate,
                 lighter task that just advances project progress every 1–2 hours without the LLM, so the list keeps
-                ticking over between full tinker runs.</p>
+                ticking over between full tinker runs.
+            </p>
 
             <h2>Why they’re synchronous</h2>
             <p>Dream and tinker run in the same process and the same loop as Telegram. When it’s time to dream, we call
@@ -91,7 +115,8 @@
                 parsing, and file/memory writes. So the loop blocks for that pass—no new messages are polled until the
                 task finishes. We accepted that tradeoff: predictable order (no races with state or memory), simpler
                 code, and for a single-user agent the delay is usually fine. If we ever need to decouple, we’d move
-                long-running tasks to a queue or a worker; for now, “one thing at a time” is enough.</p>
+                long-running tasks to a queue or a worker; for now, “one thing at a time” is enough.
+            </p>
 
             <h3>Key takeaways</h3>
             <p>Dream runs at 3 AM: it re-reads living memory (and sometimes consolidation and sacred moments), produces
