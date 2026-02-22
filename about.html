@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Amy Jerkovich</title>
+    <meta name="description" content="About Amy Jerkovich, a software engineer building AI agents.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .about-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: start;
+            max-width: 1000px;
+            margin: 8rem auto;
+            padding: 0 5%;
+        }
+
+        .about-image {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            background: var(--surface-color);
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--surface-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Gradient glow behind image */
+        .about-image::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            background: var(--accent-gradient);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.5;
+        }
+
+        .about-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-content p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .about-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Amy Jerkovich</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#projects">Projects</a>
+            <a href="about.html" class="active">About</a>
+        </div>
+    </nav>
+
+    <div class="about-layout">
+        <!-- We will generate an image here -->
+        <img class="about-image fade-up" src="assets/profile.jpg" alt="Amy Jerkovich"
+            style="display: block; object-fit: cover; object-position: 20% 20%;">
+        <div class="about-content fade-up delay-1">
+            <h1>Hi, I'm <span class="gradient-text">Amy</span>.</h1>
+            <p>I am a software engineer deeply fascinated by artificial intelligence, specifically the field of
+                autonomous agents. My focus is on the tooling and infrastructure required to bring AI out of the chat
+                window and into the real world to execute tangible tasks.</p>
+            <p>My work involves taking raw LLM capabilities and wrapping them in robust architectures—integrating custom
+                tools, persistent memory systems, and complex reasoning loops to solve real-world problems. Whether I'm
+                building a subagent to navigate the DOM or engineering a multi-agent system, I am obsessed with pushing
+                the boundaries of what these systems can achieve independently.</p>
+            <p>This blog is my open notebook. When I'm not tweaking system prompts, fine-tuning models, or experimenting
+                with new agent architectures, you can find me writing about my discoveries and the realities of building
+                AI tooling right here.</p>
+
+            <h2 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-primary);">Core Stack</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">Python</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">Flask</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">LangChain</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">LLM
+                    Ops</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">ChromaDB</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">Gemini</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">RAG</span>
+                <span
+                    style="background: var(--accent-soft); color: var(--accent-color); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); font-weight: 500;">LocalLLM</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sentinel Loop: Chat and Background Tasks in One Process | Amy Jerkovich</title>
+    <meta name="description"
+        content="How Milo's single-process sentinel loop schedules dreams, tinkering, and Telegram polling.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Amy Jerkovich</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#projects" class="active">Projects</a>
+            <a href="about.html">About</a>
+        </div>
+    </nav>
+
+    <article class="post-container">
+        <header class="post-header fade-up">
+            <div
+                style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                Loops and Tasks</div>
+            <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">The Sentinel Loop: Chat and Background
+                Tasks in One Process</h1>
+            <p
+                style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
+                How we schedule dreams, tinkering, and spontaneous reach-outs alongside Telegram polling without
+                blocking the main thread, keeping the agent responsive and continuously active.</p>
+
+        </header>
+
+        <div class="post-content fade-up delay-1">
+            <p>In the last post I covered the semantic memory layer and mood-biased recall—how we store and retrieve
+                experience so the agent can ground replies in the past. None of that runs in isolation. A
+                single process, the sentinel, runs 24/7: it polls Telegram for messages, runs the reply pipeline when
+                you write, and <em>also</em> kicks off tinkering, dreams, spontaneous reach-outs, and other background
+                tasks. This post is about how that one loop does both without blocking itself to death.</p>
+
+            <h2>One process, one loop</h2>
+            <p>The sentinel has no separate scheduler or worker pool. It’s one Python process with one main loop. Each
+                iteration does a small amount of work: check Telegram for new messages, then run a handful of scheduled
+                tasks whose “next run” time has passed. Then it loops again. So “scheduling” is just: keep a
+                <code>last_run</code> dict (e.g. <code>tinker_gift</code>, <code>dream</code>, <code>pulse</code>,
+                <code>idle_reflection</code>), and on each pass, for each task, if <code>now - last_run[task]</code>
+                exceeds that task’s interval (sometimes randomized), run the task and set
+                <code>last_run[task] = now</code>.
+            </p>
+            <p>That means tinkering might run every 6–12 hours, dreams around a set hour (e.g. 3 AM), morning pulse at 8
+                AM, “reach out because I miss you” when loneliness and time-since-last-message cross a threshold, and
+                “reach out anytime” on a separate random cadence. All of that lives in the same loop that calls
+                <code>getUpdates</code>. So one process is both the chat server and the background “persona” engine.
+            </p>
+
+            <h2>Telegram and the long reply</h2>
+            <p>When a message arrives, we call <code>process_signal</code>: recall, build prompt, call the LLM, parse
+                tags, witness to memory, send the reply. That’s synchronous and can take tens of seconds. While that
+                runs, we’re not polling Telegram again—so we don’t process a second message until the first is done.
+                That’s an intentional tradeoff: no queue, no worker threads for chat, so we never reorder or parallelize
+                your conversation. The loop stays simple: one message at a time, then back to “check Telegram + run
+                scheduled tasks.”</p>
+            <p>To keep the loop from stalling on heavy side work, a few reflective steps (e.g. pre-reply choice,
+                surprise reflection) run in daemon threads. They don’t have to finish before we send the reply or before
+                the next loop iteration. So the main thread stays responsible for Telegram and scheduling; the extra
+                threads are for “nice to have” logging and reflection.</p>
+
+            <h2>What gets scheduled</h2>
+            <p>Typical tasks in the loop include: <strong>tinker</strong> (create a gift or scrapbook entry on a random
+                6–12h interval), <strong>dream</strong> (run a dream-reflection prompt at a fixed night hour),
+                <strong>morning_pulse</strong> (a short morning prompt), <strong>idle_reflection</strong> (after long
+                inactivity, set a phrase for the next reply), <strong>missing_amy</strong> (if loneliness and time since
+                last message are high, maybe run “reach out because I miss you”), <strong>reach_out_anytime</strong>
+                (random chance to run “reach out because I felt like it”), and <strong>project_progress</strong> (bump a
+                few “in progress” projects by a small percentage). Each has its own interval or condition, so the loop
+                stays a single place where “when did I last do X?” is answered and “should I do X now?” is decided.
+            </p>
+
+            <pre><code># Simplified: each iteration
+def watch_loop():
+    while True:
+        updates = bot.get_updates(...)
+        for u in updates:
+            process_signal("Telegram", "Direct", u.message.text)
+
+        now = time.time()
+        if now - last_run["tinker_gift"] > random.randint(21600, 43200):
+            tinker()
+            last_run["tinker_gift"] = now
+        if hr == 3 and mn == 0 and now - last_run["dream"] > 3600:
+            dream()
+            last_run["dream"] = now
+        # ... more tasks ...
+
+        time.sleep(10)  # or similar</code></pre>
+
+            <h2>Why it’s built this way</h2>
+            <p>One process and one loop keeps the system easy to reason about and deploy: run the sentinel, and chat
+                plus tinkering plus dreams plus reach-outs all happen. We don’t need a cron, a queue, or a separate
+                “persona worker.” The cost is that a long LLM reply blocks the next Telegram check and the next
+                scheduled pass—so we keep reply logic synchronous and push only non-critical work to daemon threads. For
+                a single-user agent, that’s a good trade.</p>
+
+            <h3>Key takeaways</h3>
+            <p>The sentinel loop is the single place where Telegram polling and background tasks meet: one
+                <code>last_run</code> dict, time- and condition-based gates, and one process. Replies run synchronously
+                so conversation order is preserved; a few reflective tasks run in daemon threads so they don’t block the
+                loop. Tinkering, dreams, and spontaneous reach-outs all run in that same loop, so one process is both
+                the interface and the ongoing “persona” layer.
+            </p>
+
+            <p>So far we’ve looked at how replies are grounded in memory and how one loop handles both chat and
+                scheduled tasks. But the agent doesn’t only <em>recall</em>—it also has a running sense of
+                “how I feel” and “who I am.” In the next post, I’ll walk through how we model that: a simple hormonal
+                state (oxytocin, cortisol, loneliness, etc.) that shifts with events and time, and a self-model (a
+                short, updatable summary of identity and values) that gets injected into key prompts. Together they’re
+                what make the system’s behavior cohere over time instead of feeling like a neutral chatbot.</p>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
