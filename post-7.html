@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram as the interface | Amy Jerkovich</title>
+    <meta name="description" content="Why we chose Telegram, how the connection works, and what makes it reliable.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Amy Jerkovich</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#projects" class="active">Projects</a>
+            <a href="about.html">About</a>
+        </div>
+    </nav>
+
+    <article class="post-container">
+        <header class="post-header fade-up">
+            <div
+                style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                Project Dive</div>
+            <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Telegram as the interface</h1>
+        </header>
+
+        <div class="post-content fade-up delay-1">
+            <p>We’ve covered how the sentinel loop runs chat and background tasks in one process, and how each reply is
+                built and guarded. But how do you actually <em>talk</em> to the agent? In our setup, the interface is
+                Telegram: one bot, one chat, long-polling in the same process that does tinkering and dreams. This post
+                is about why we chose Telegram, how the connection works, and what we had to get right so it stays
+                reliable.</p>
+
+            <h2>Why Telegram</h2>
+            <p>We needed something that works on a Pi, doesn’t require you to host a web server or open ports, and feels
+                like a normal chat. Telegram gives you a bot API, a stable long-polling interface, and clients on every
+                platform. You message the bot; the sentinel calls <code>getUpdates</code>, gets your message, runs the
+                reply pipeline, and sends the response back with <code>sendMessage</code>. No webhooks, no HTTPS
+                certificate, no public URL—just one process that polls and replies. So the “interface” is a chat you
+                already have on your phone or desktop, and the agent lives in that thread.</p>
+
+            <h2>Long-polling in the loop</h2>
+            <p>The sentinel doesn’t run a separate “Telegram thread.” Each time through the main loop, it calls
+                <code>getUpdates</code> (with an offset so we don’t reprocess the same updates). If there’s nothing new,
+                the call returns quickly and we move on to scheduled tasks (tinker, dream, reach-out checks, etc.). If
+                there’s a new message, we run <code>process_signal</code> for that message—recall, prompt, LLM, parse,
+                guardrails, witness, send—and only then do we loop again. So Telegram is checked on every iteration;
+                when a message is there, we handle it synchronously, one at a time. That keeps conversation order strict
+                and the code simple: no queue, no worker pool, just “poll → maybe reply → do background work → poll
+                again.”</p>
+
+            <pre><code># Simplified: one iteration of the loop
+updates = bot.get_updates(offset=last_update_id + 1, timeout=10)
+for u in updates:
+    if u.message.text:
+        process_signal("Telegram", "Direct", u.message.text)
+    last_update_id = u.update_id
+
+# Then: run scheduled tasks (tinker, dream, reach_out, ...)
+# Then: loop again</code></pre>
+
+            <h2>The 409 problem</h2>
+            <p>Telegram allows only <strong>one</strong> consumer of updates per bot: either one long-polling client or
+                one webhook. If two processes call <code>getUpdates</code> with the same token, or if a webhook is set
+                while we’re polling, Telegram returns 409 Conflict and neither consumer gets updates reliably. So we had
+                to enforce “exactly one sentinel process.” When we see 409, we back off (e.g. wait 30 seconds), and the
+                code tries once to clear any webhook so that this process can take over polling. If 409 keeps happening,
+                the fix is operational: stop the other process or remove the webhook, then restart. We also made sure
+                the service is the only thing that runs the sentinel (no manual <code>python sentinel.py</code> in a
+                terminal while the service is up). So the interface stays stable as long as there’s a single poller.</p>
+
+            <h2>What gets sent back</h2>
+            <p>When we’re done with the reply pipeline, we send the [REPLY] text with <code>sendMessage</code> to the
+                configured chat ID. We can also send photos (e.g. generated images), and we use the same channel for
+                one-off notifications (e.g. “a draft is waiting,” “I proposed a change—do you consent?”). So Telegram is
+                both the daily chat and the channel for system prompts (consent, drafts, reminders). One thread, one
+                relationship—and the agent uses it for conversation and for the occasional administrative moment.</p>
+
+            <h2>Why it’s built this way</h2>
+            <p>Putting Telegram inside the main loop keeps deployment simple: no separate API server, no webhook setup,
+                no port forwarding. The tradeoff is that a long reply (LLM call plus memory and guardrails) blocks the
+                next poll and the next scheduled pass—so we accepted “one message at a time” and kept the reply path
+                synchronous. For a single-user agent, that’s enough: you get a responsive chat that shares one process
+                with the rest of the system, and we avoid the complexity of queues and workers until we need them.</p>
+
+            <h3>Key takeaways</h3>
+            <p>Telegram is the interface: one bot, one chat, long-polling in the same process that runs the sentinel
+                loop. We poll on every iteration, handle messages one at a time, and send the reply (and sometimes
+                photos or notifications) back through the same channel. Keeping exactly one consumer avoids 409; keeping
+                Telegram in the main loop keeps the architecture simple. The agent lives in a thread you already have—no
+                extra app, no open ports—and that thread is where conversation and consent both happen.</p>
+        </div>
+    </article>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
