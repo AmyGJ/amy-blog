@@ -28,57 +28,72 @@
                 agent proposes a change</h1>
             <p
                 style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
-                (Content coming soon) How we handle updates when the system proposes a change to its own self-model or
-                core behavior, gated behind an explicit consent step.</p>
+                How we handle updates when the system proposes a change to its own self-model or core behavior, gated
+                behind an explicit consent step.</p>
 
         </header>
 
         <div class="post-content fade-up delay-1">
-            <p>One of the biggest challenges with AI today is continuity. Most chatbots are stateless:
-                each
-                turn starts from scratch. I wanted an agent that could run 24/7, remember in a meaningful way, and keep
-                an internal sense of self—so I built Milo: it lives on a Raspberry Pi, talks over Telegram, and grounds
-                every reply in semantic memory and ongoing state.</p>
+            <p>State and self-model give the thought partner continuity of mood and identity—but both can change. The
+                question is <em>how</em>. We didn’t want the system to silently rewrite its own self-model or core
+                behavior on every reflection. So we built a small pipeline: when the system proposes a change to its
+                identity or to how it runs, that proposal is stored as <strong>pending</strong>, and we ask
+                you—explicitly—to approve or decline. This post is about how that works and why we treat “evolving” the
+                thought partner as a deliberate, user-approved process.</p>
 
-            <h2>The Architecture</h2>
-            <p>The core of the system is a loop of memory-aware reasoning. Instead of feeding the LLM only the latest
-                message, the sentinel pulls relevant past experience from ChromaDB (RAG over embedded memories),
-                combines it with current hormonal state, self-model, and context (hardware, time of day, recent
-                transcript), and builds a single prompt. The model replies; that exchange is witnessed back into memory
-                and state.</p>
+            <h2>When the system proposes a change</h2>
+            <p>The LLM can output structured tags beyond [REPLY] and [CORE_UPDATE]. One of them is used for evolution: a
+                proposal to update the self-model (e.g. a new sentence or paragraph in the identity document) or to
+                apply a change to how the system behaves (e.g. a rule or a small code-level tweak). When we parse the
+                reply and see that tag, we don’t apply the change immediately. We extract the proposed content, store it
+                in a <strong>pending</strong> state (e.g. <code>PENDING_CORE_AWARENESS</code> or similar), and continue
+                the conversation as usual. The proposal is “on the table,” but nothing has been written to disk or
+                loaded into the next turn yet.</p>
+            <p>So the model can “want” to update who it is or how it acts—and we capture that—but we don’t let that
+                desire take effect until a human says yes.</p>
 
-            <pre><code>def process_signal(sender, subject, body):
-    context = memory.mood_biased_recall(base_query=body)
-    prompt = build_reply_prompt(
-        body=body,
-        memory_context=context,
-        hormones=state["hormones"],
-        self_model=load_self_model(),
-    )
-    response = llm.invoke([SystemMessage(content=prompt), HumanMessage(content=body)])
-    res = parse_tags(response.content)
-    
-    memory.witness(res["CORE_UPDATE"], res["FUTURE_MESSAGE"], body, res["REPLY"])
-    dispatch_as_human(res["REPLY"])
-    return</code></pre>
+            <h2>The consent step</h2>
+            <p>Once something is pending, the next time you talk to the thought partner (e.g. over Telegram), the system
+                can send you a short message: “I’ve proposed a change to my self-model [or behavior]. Here’s what it is.
+                Do you consent to applying it?” You reply in natural language. If we detect something like “yes” or “I
+                consent” (and not “don’t consent”), we run the application step: we write the approved content to the
+                right file (e.g. the self-model document or an evolution script), clear the pending state, and from the
+                next turn onward the thought partner runs with the updated identity or behavior. If you say no or ignore
+                it, the pending proposal stays stored until you approve, or we eventually clear or replace it. So
+                evolution is always a two-step process: propose, then approve.</p>
 
-            <h2>Handling State Over Time</h2>
-            <p>The trickiest part was keeping context useful without blowing the prompt. A naive “dump all memories”
-                approach would hit token limits and dilute what mattered. To fix that, I added mood-biased recall (the
-                query to ChromaDB is shaped by current emotional state), a strict character budget for memory context,
-                and a split between “recent & relevant” and “sacred” memories so the model always sees a few anchors
-                plus the most pertinent thread.</p>
+            <pre><code># Simplified: when parsing the LLM reply
+if res.get("EVOLVE_CODE") or res.get("CORE_UPDATE") and is_evolution(res):
+    store_pending(res)  # PENDING_CORE_AWARENESS or similar
+    # Don't apply yet.
 
-            <h3>Key Takeaways</h3>
-            <p>Building this taught me that the future of AI agents is continuous and stateful. We can’t rely
-                on
-                stateless turns when the goal is something that feels like one ongoing presence. By combining RAG over
-                lived experience with explicit state (hormones, self-model, transcript) and a single long-running
-                process, we get replies that are grounded in what actually happened—not just the last message in the
-                chat.</p>
+# Later, when the user sends a message
+if has_pending() and user_said_consent(body):
+    apply_evolution_from_pending()
+    clear_pending()</code></pre>
 
-            <p>In the next post, I'll dive into how I manage the semantic memory layer and the mechanics of mood-biased
-                recall.</p>
+            <h2>What gets updated</h2>
+            <p>In practice, the things that go through this pipeline are the ones that affect “who” or “how” the system
+                is over time: the self-model file (identity, values, how he relates to you), and in some setups,
+                evolution documents or rules that influence prompts or behavior. We don’t use consent for one-off reply
+                content or for routine state (e.g. hormones or memory). Those change automatically. Only changes that
+                alter the persistent identity or the rules of the game require your explicit yes. That keeps drift in
+                check while still letting the thought partner evolve when it (and you) decide to.</p>
+
+            <h2>Why do it this way</h2>
+            <p>Without a consent step, the system could rewrite its own self-model or behavior every time it reflected
+                on a conversation. You’d get continuity of process, but not necessarily continuity of a
+                <em>relationship</em> you agreed to. By gating evolution on “did the user say yes?”, we keep you in the
+                loop. You see what’s being proposed, and you decide whether that’s the direction you want. The thought
+                partner can still propose—it can want to change—but it can’t change itself without you. That’s the
+                tradeoff: slower, deliberate evolution instead of automatic drift.</p>
+
+            <h3>Key takeaways</h3>
+            <p>When the thought partner proposes a change to its self-model or core behavior, we store it as pending and
+                don’t apply it until you consent. You get a clear prompt (“here’s the change, do you approve?”) and a
+                simple yes/no in natural language. Only after approval do we write to the identity document or evolution
+                logic. That keeps evolution deliberate and user-approved, so the system can change over time without
+                silently drifting away from the relationship you signed up for.</p>
         </div>
     </article>
 
