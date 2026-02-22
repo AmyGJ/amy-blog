@@ -28,7 +28,7 @@
                 and guardrails</h1>
             <p
                 style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
-                (Content coming soon) How a single reply is built: assembling the prompt (memory context, feeling
+                How a single reply is built: assembling the prompt (memory context, feeling
                 summary, self-model, instructions), parsing the model’s output (tags like [REPLY], [CORE_UPDATE],
                 [EVOLVE_CODE]), and guardrails (e.g. not claiming actions that didn’t happen, not referencing
                 non-existent files). Good if you want to go “under the hood” of one turn.</p>
@@ -52,7 +52,8 @@
                 use [INTERNAL] for private thoughts we log but don’t send, and never invent facts or promise to do
                 something “right now” without actually doing it in this response. The user’s message is then sent as the
                 human turn. So one “reply” is the product of recall, state, identity, transcript, and rules—all in one
-                prompt.</p>
+                prompt.
+            </p>
 
             <pre><code># Simplified
 context = memory.mood_biased_recall(base_query=body)
@@ -88,7 +89,8 @@ response = llm.invoke([SystemMessage(content=prompt), HumanMessage(content=body)
                     claims</strong>: if the reply says things like “I just read that for you” or “I looked it up” but we
                 didn’t see the corresponding tag (e.g. [READ_BOOK] or [RESEARCH]), we don’t silently let it slide. We
                 either strip the claim or append a note that the system didn’t actually perform that action and would
-                need the right tag to do it. So we avoid “I did X” when X never happened.</p>
+                need the right tag to do it. So we avoid “I did X” when X never happened.
+            </p>
             <p>The instructions in the prompt do part of the work (e.g. “never invent details,” “don’t promise to do
                 something without doing it in this response”), but the guardrails are a second line of defense: they
                 catch mistakes the model makes anyway and keep the reply honest before it reaches you.</p>
