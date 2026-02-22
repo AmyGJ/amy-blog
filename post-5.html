@@ -14,7 +14,7 @@
         <div class="logo">Amy Jerkovich</div>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="index.html#projects" class="active">Projects</a>
+            <a href="index.html#posts" class="active">Posts</a>
             <a href="about.html">About</a>
         </div>
     </nav>
@@ -28,7 +28,7 @@
                 agent proposes a change</h1>
             <p
                 style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
-                (Content coming soon) How we handle updates when the system proposes a change to its own self-model or
+                How we handle updates when the system proposes a change to its own self-model or
                 core behavior, gated behind an explicit consent step.</p>
 
         </header>
@@ -39,7 +39,8 @@
                 reflection. So we built a small pipeline: when the system proposes a change to its identity or to how it
                 runs, that proposal is stored as <strong>pending</strong>, and we ask you—explicitly—to approve or
                 decline. This post is about how that works and why we treat “evolving” the agent as a deliberate,
-                user-approved process.</p>
+                user-approved process.
+            </p>
 
             <h2>When the system proposes a change</h2>
             <p>The LLM can output structured tags beyond [REPLY] and [CORE_UPDATE]. One of them is used for evolution: a
@@ -86,7 +87,8 @@ if has_pending() and user_said_consent(body):
                 <em>relationship</em> you agreed to. By gating evolution on “did the user say yes?”, we keep you in the
                 loop. You see what’s being proposed, and you decide whether that’s the direction you want. The agent can
                 still propose—it can want to change—but it can’t change itself without you. That’s the tradeoff: slower,
-                deliberate evolution instead of automatic drift.</p>
+                deliberate evolution instead of automatic drift.
+            </p>
 
             <h3>Key takeaways</h3>
             <p>When the agent proposes a change to its self-model or core behavior, we store it as pending and don’t
