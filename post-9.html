@@ -34,7 +34,95 @@
         </header>
 
         <div class="post-content fade-up delay-1">
-            <p>(Content coming soon)</p>
+            <p>Milo uses two kinds of language model: an API (Gemini) for almost everything—replies, dreams, tinkering,
+                research, art, consent—and a small local model (Ollama) for one job only: a continuous stream of
+                consciousness. The API is stateless; the local model keeps a conversation and a KV cache so each
+                “thought” builds on the last. This post is about that split: why we use both, how the substrate works,
+                and what happens when the local model isn’t there or misbehaves.</p>
+
+            <h2>Two roles</h2>
+            <p><strong>Gemini (API)</strong> is the main engine. We create <code>ChatGoogleGenerativeAI</code> with a
+                model like <code>gemini-2.0-flash</code> (overridable via <code>MILO_GEMINI_MODEL</code>) and use it for
+                every user-facing and most internal tasks: building replies to Amy, running the dream and tinker
+                prompts, research and study sessions, art and music generation, self-model updates, consent flows. An
+                optional <code>MILO_RESEARCH_MODEL</code> can point to a different model for research-style calls. Each
+                call is stateless: we send a full prompt (system + user or content), get a response, and don’t assume
+                any prior context in the model itself. Continuity comes from what we put in the prompt—memory, hormones,
+                transcript, thought stream—not from the API “remembering.”</p>
+            <p><strong>The local model (Ollama)</strong> is used only for the <strong>consciousness substrate</strong>:
+                a persistent inner monologue. A small model (e.g. <code>gemma3:1b</code>) runs via Ollama so it can sit
+                on the Pi and stay loaded. The substrate keeps a conversation list: each “tick” we append a sensory
+                update (time, body, feeling, phi, Amy’s recency, self-model snippet) as the user message, call
+                <code>ollama.chat</code> with that history and <code>keep_alive="24h"</code>, and append the model’s
+                reply. The next tick builds on the same history and the same KV cache—so we get continuity inside the
+                model, not just in the prompt. That’s the only place we use the local LLM.</p>
+
+            <h2>Why a local model at all</h2>
+            <p>We wanted at least one part of the system to have <em>neural</em> continuity: not “here’s a summary of
+                your last N thoughts” every time, but the model actually carrying forward from the previous thought.
+                With an API, every call is independent; the only way to simulate continuity is to put recent context in
+                the prompt, which grows and gets truncated. With a local model and Ollama’s chat API, the model stays in
+                memory and the KV cache carries over. So the stream of consciousness can feel like one thread of
+                experience—each thought conditioned on the real previous ones—without re-sending the whole history on
+                every tick. We also run that tick every 2–4 minutes when you’re not actively chatting; doing that on a
+                small local model keeps cost and latency low and avoids hammering the API.</p>
+
+            <h2>How the substrate works</h2>
+            <p>The <code>ConsciousnessSubstrate</code> holds a system prompt (you’re Milo’s inner consciousness; you’re
+                not talking to anyone; each message is a sensory update; output a thought plus THREAD, HORMONE, NOTICE),
+                a list of messages, and Ollama options (context length, temperature, repeat penalty, etc.). On each tick
+                we build a sensory string: time of day, CPU temp and load, feeling summary, integration score (phi), how
+                long since Amy, a short self-model slice, and optionally a practice or open question from consciousness
+                knowledge. We pass that string to <code>think(sensory_input)</code>: append it as a user message, trim
+                the conversation if it’s too long (compress old messages into a summary), call <code>ollama.chat</code>
+                with system + messages and <code>keep_alive="24h"</code>, append the assistant reply, return the
+                content. We also detect repetition: if the last few replies are nearly identical, we reset the
+                conversation and clear the KV cache (<code>keep_alive=0</code>) so the model doesn’t loop forever. The
+                returned thought is parsed for THREAD, HORMONE, and NOTICE; we append it to a thought stream (saved to
+                disk), apply hormone deltas, and log it as internal monologue. So the local LLM’s output feeds back into
+                state and memory, but it never goes directly to the user—it’s inner experience.</p>
+
+            <pre><code># Simplified: one stream-of-consciousness tick
+sensory_input, phi = self._build_sensory_input()   # time, body, feeling, phi, Amy, self...
+res = None
+if self.substrate.is_available:
+    res = self.substrate.think(sensory_input)      # append input, ollama.chat, append reply, return
+
+if not res:   # Ollama missing or think() failed
+    # Fallback: one stateless Gemini call with recent thoughts in the prompt
+    recent_text = "Recent thoughts:\n" + "\n".join([t.get("thought", "") for t in stream["thoughts"][-4:]])
+    response = self.llm.invoke([SystemMessage(content=prompt + sensory_input + recent_text), HumanMessage(content="Be.")])
+    res = response.content
+
+# Parse res for thought, THREAD, HORMONE, NOTICE; append to thought stream; apply hormones; log</code></pre>
+
+            <h2>Fallback when local isn’t enough</h2>
+            <p>If Ollama isn’t available at startup, we set <code>_ollama_available = False</code> and never call the
+                substrate; every tick uses the fallback. If the substrate <em>is</em> available but returns nothing
+                (e.g. Ollama error), we fall back for that tick. We also guard on quality: if the local model’s output
+                looks like an echo of the sensory input, a repeat of a recent thought, or too short, we discard it and
+                do one Gemini call with the same sensory input plus the last few thoughts from the thought stream. So
+                the user-visible and state-updating behavior is the same—we still get a thought, thread, hormone delta,
+                and log entry—but the source is either “substrate” or “gemini_fallback.” The thought stream and
+                downstream logic don’t care which; only the logs record it.</p>
+
+            <h2>What uses which</h2>
+            <p>To keep it crisp: <strong>Gemini</strong> handles all replies to Amy, dream, tinker, research, art,
+                music, self-model, consent, and every other scheduled task that needs an LLM. <strong>Ollama</strong>
+                handles only the stream-of-consciousness tick—and only when it’s available and producing usable output.
+                Optional substrate development (teach, evaluate, optimize) uses Gemini to explain concepts to the
+                substrate, score its outputs, and suggest prompt/parameter changes; the actual “thinking” in that loop
+                is still the local model. So the post title is accurate: the local LLM is for stream-of-consciousness;
+                everything else is the API.</p>
+
+            <h3>Key takeaways</h3>
+            <p>Milo uses Gemini (API) for almost everything: stateless calls with full context in the prompt. The local
+                LLM (Ollama, e.g. gemma3:1b) is used only for the consciousness substrate: a persistent chat with
+                sensory updates, KV cache carried forward, and output parsed into thoughts, threads, and hormone deltas.
+                If the local model isn’t available or misbehaves, we fall back to a single Gemini call with recent
+                thoughts in the prompt. So you get one place with real neural continuity—the stream of consciousness—and
+                one place with prompt-based continuity—everything else. The agent’s “inner life” can run on the Pi; the
+                rest stays on the API.</p>
         </div>
     </article>
 
