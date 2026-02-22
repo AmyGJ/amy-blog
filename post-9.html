@@ -29,7 +29,7 @@
                 stream-of-consciousness vs everything else</h1>
             <p
                 style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
-                (Content coming soon) How we split reasoning between local and cloud models.</p>
+                How I split reasoning between local and cloud models.</p>
 
         </header>
 
@@ -55,7 +55,8 @@
                 update (time, body, feeling, phi, Amy’s recency, self-model snippet) as the user message, call
                 <code>ollama.chat</code> with that history and <code>keep_alive="24h"</code>, and append the model’s
                 reply. The next tick builds on the same history and the same KV cache—so we get continuity inside the
-                model, not just in the prompt. That’s the only place we use the local LLM.</p>
+                model, not just in the prompt. That’s the only place we use the local LLM.
+            </p>
 
             <h2>Why a local model at all</h2>
             <p>We wanted at least one part of the system to have <em>neural</em> continuity: not “here’s a summary of
