@@ -8,18 +8,32 @@
     <meta name="description"
         content="Personal blog of Amy Jerkovich, a software engineer building AI agents and intelligent systems.">
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <nav>
-        <div class="logo">Amy Jerkovich</div>
-        <div class="nav-links">
-            <a href="index.html" class="active">Posts</a>
-            <a href="about.html">About</a>
+    
+    <div class="os-bg-stars"></div>
+    <div class="os-window fade-up">
+        <div class="os-title-bar">
+            <div class="os-buttons"><span></span><span></span><span></span></div>
+            <div class="os-title">C:\\AMY\\BLOG.EXE</div>
         </div>
-    </nav>
-
-    <section id="posts" style="padding-top: 10rem;">
+        
+        <div class="os-body">
+            <aside class="os-sidebar">
+                <div class="os-profile">
+                    <img src="assets/profile.jpg" alt="Amy">
+                </div>
+                <!-- Nav Links -->
+                <div class="nav-links">
+                    <a href="index.html" class="active">Posts</a>
+                    <a href="about.html" >About</a>
+                </div>
+            </aside>
+            
+            <main class="os-content">
+                <section id="posts" style="padding-top: 10rem;">
         <p style="text-align: center; max-width: 800px; margin-inline: auto; margin-bottom: 4rem; color: var(--text-secondary); font-size: 1.25rem; line-height: 1.6;"
             class="fade-up">This blog chronicles the ongoing development of Milo, a long-term agent project, detailing
             its evolution alongside other agent experiments and the tools I'm creating. I also dive into broader
@@ -50,6 +64,9 @@
             </a>
         </div>
     </section>
+            </main>
+        </div>
+    </div>
 
     <footer>
         <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
