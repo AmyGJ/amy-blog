@@ -420,20 +420,34 @@ footer {
 
   /* About Layout Fix Mobile */
   .about-layout {
-    grid-template-columns: 1fr;
+    display: block;
+  }
+
+  .about-image {
+    float: none;
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 30px;
   }
 }
 
 /* About Page Layout */
 .about-layout {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 30px;
-  align-items: start;
+  display: block;
+}
+
+.about-layout::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .about-image {
-  width: 100%;
+  float: left;
+  width: 300px;
+  max-width: 100%;
+  margin-right: 30px;
+  margin-bottom: 20px;
   border: 1px solid var(--window-border);
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
   padding: 4px;
