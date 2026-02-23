@@ -398,6 +398,7 @@ footer {
     justify-content: space-between;
     align-items: center;
     padding: 15px;
+    flex-wrap: wrap;
   }
 
   .os-profile {
@@ -455,26 +456,18 @@ footer {
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
-/* Post Index Layout */
-.post-index-layout {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 40px;
-  align-items: start;
-}
-
+/* Sidebar Date Index */
 .date-index {
-  position: sticky;
-  top: 40px;
-  padding-right: 20px;
-  border-right: 1px dashed var(--window-border);
+  margin-top: 2rem;
+  width: 100%;
 }
 
 .date-index h3 {
   font-family: 'Press Start 2P', cursive;
   font-size: 0.8rem;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 .date-index ul {
@@ -482,7 +475,7 @@ footer {
 }
 
 .date-index li {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .date-index a {
@@ -491,6 +484,7 @@ footer {
   color: var(--link-color);
   text-decoration: none;
   display: inline-block;
+  border-bottom: 1px solid transparent;
 }
 
 .date-index a:hover {
@@ -499,16 +493,15 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .post-index-layout {
-    grid-template-columns: 1fr;
+  .date-index {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--window-border);
   }
 
-  .date-index {
-    position: static;
-    border-right: none;
-    border-bottom: 1px dashed var(--window-border);
-    padding-right: 0;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
+  .date-index ul {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
   }
 }
