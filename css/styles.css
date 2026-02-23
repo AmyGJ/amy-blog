@@ -440,6 +440,12 @@ footer {
   background: #fff;
 }
 
+.about-content p {
+  margin-bottom: 2rem;
+  font-size: 1.4rem;
+  line-height: 1.6;
+}
+
 .stack-tags {
   display: flex;
   gap: 10px;
