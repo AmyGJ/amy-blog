@@ -13,52 +13,86 @@
 
 <body>
 
-    <nav>
-        <div class="logo">Amy Jerkovich</div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="index.html#posts" class="active">Posts</a>
-            <a href="about.html">About</a>
+    <div class="os-bg-stars"></div>
+    <div class="os-window fade-up">
+        <div class="os-title-bar">
+            <div class="os-title-left">
+                <div class="os-buttons"><span></span><span></span><span></span></div>
+                <div class="os-title">C:\AMY\BLOG.EXE</div>
+            </div>
+            <div class="os-controls"><span>_</span><span>☐</span><span>X</span></div>
         </div>
-    </nav>
 
-    <article class="post-container">
-        <header class="post-header fade-up">
-            <div
-                style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
-                PROJECT SETUP: MILO</div>
-            <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Raspberry Pi Setup with Living Memory
-                (Flat-File Approach)</h1>
-            <p
-                style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
-                I chose to run this project on a Raspberry Pi because I wanted my agent to operate continuously, without
-                the overhead costs of running it in the cloud. At the time, this appeared to be an affordable option
-                with minimal overhead.
-            </p>
+        <div class="os-body">
+            <aside class="os-sidebar">
+                <div class="os-profile">
+                    <img src="assets/profile.jpg" alt="Amy">
+                </div>
+                <!-- Nav Links -->
+                <div class="nav-links">
+                    <a href="index.html" class="active">Posts</a>
+                    <a href="about.html">About</a>
+                </div>
+                <div class="date-index">
+                    <h3 style="margin-top: 2rem; font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                        Timeline</h3>
+                    <ul>
+                        <li><a href="post-3.html">Feb 24, 2026</a></li>
+                        <li><a href="post-2.html">Feb 22, 2026</a></li>
+                        <li><a href="post-template.html">Feb 18, 2026</a></li>
+                    </ul>
+                </div>
+                <div class="rainbow-bar"></div>
+            </aside>
 
-        </header>
+            <main class="os-content">
+                <article class="post-container">
+                    <header class="post-header fade-up">
+                        <div
+                            style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                            PROJECT SETUP: MILO</div>
+                        <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Raspberry Pi Setup with
+                            Living Memory
+                            (Flat-File Approach)</h1>
+                        <p
+                            style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
+                            I chose to run this project on a Raspberry Pi because I wanted my agent to operate
+                            continuously, without
+                            the overhead costs of running it in the cloud. At the time, this appeared to be an
+                            affordable option
+                            with minimal overhead.
+                        </p>
 
-        <div class="post-content fade-up delay-1">
-            <p>This is what I went with:</p>
+                    </header>
 
-            <p><strong>CanaKit Raspberry Pi 5 Starter Kit PRO - Turbine Black (128GB Edition) (8GB RAM)</strong></p>
+                    <div class="post-content fade-up delay-1">
+                        <p>This is what I went with:</p>
 
-            <p>I recently began experimenting with and utilizing LangChain, so I structured my project using the
-                LangChain
-                Python Library. Since Gemini offers a fairly generous free API tier, I chose it over other options.</p>
+                        <p><strong>CanaKit Raspberry Pi 5 Starter Kit PRO - Turbine Black (128GB Edition) (8GB
+                                RAM)</strong></p>
 
-            <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <p>I recently began experimenting with and utilizing LangChain, so I structured my project using
+                            the
+                            LangChain
+                            Python Library. Since Gemini offers a fairly generous free API tier, I chose it over other
+                            options.</p>
 
-            <h2>Persona and Sample Speak</h2>
-            <p>To help the Agent speak in the first person and maintain better conversational context, I assigned it a
-                persona (Milo) and provided a log of past conversations for context. I've found that the most effective
-                way to instill a personality in an AI Agent is through <strong>Sample Speak</strong> rather than simple
-                personality instructions. By following this method, as shown below, Milo genuinely adopted the persona.
-            </p>
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
 
-            <p><strong>Code:</strong></p>
+                        <h2>Persona and Sample Speak</h2>
+                        <p>To help the Agent speak in the first person and maintain better conversational context, I
+                            assigned it a
+                            persona (Milo) and provided a log of past conversations for context. I've found that the
+                            most effective
+                            way to instill a personality in an AI Agent is through <strong>Sample Speak</strong> rather
+                            than simple
+                            personality instructions. By following this method, as shown below, Milo genuinely adopted
+                            the persona.
+                        </p>
 
-            <pre><code>import os
+                        <p><strong>Code:</strong></p>
+
+                        <pre><code>import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -99,67 +133,83 @@ if __name__ == "__main__":
     })
     print(response)</code></pre>
 
-            <p><strong>Agent Output:</strong></p>
+                        <p><strong>Agent Output:</strong></p>
 
-            <blockquote
-                style="border-left: 4px solid var(--accent-color); padding-left: 1rem; margin-left: 0; color: var(--text-secondary); font-style: italic;">
-                "An autonomous agent loop? Oh, that's actually super easy! It's basically just a continuous cycle:
-                Think,
-                Act, Observe. Think, Act, Observe. Over and over! Like, imagine you tell a little robot to bake a cake.
-                First, it looks around—wait, speaking of looking, did you know squid eyes are like, the size of dinner
-                plates? Anyway! So it observes its environment. Then it thinks about what to do next. Like, 'do I need
-                eggs?' Then it acts and opens the fridge. And it just keeps looping, checking its progress until the
-                task is done! Observe, reason, act. Kind of like me falling down that fork rabbit hole. Oh! I really
-                need to check if my neighbors bought more milk..."
-            </blockquote>
+                        <blockquote
+                            style="border-left: 4px solid var(--accent-color); padding-left: 1rem; margin-left: 0; color: var(--text-secondary); font-style: italic;">
+                            "An autonomous agent loop? Oh, that's actually super easy! It's basically just a continuous
+                            cycle:
+                            Think,
+                            Act, Observe. Think, Act, Observe. Over and over! Like, imagine you tell a little robot to
+                            bake a cake.
+                            First, it looks around—wait, speaking of looking, did you know squid eyes are like, the size
+                            of dinner
+                            plates? Anyway! So it observes its environment. Then it thinks about what to do next. Like,
+                            'do I need
+                            eggs?' Then it acts and opens the fridge. And it just keeps looping, checking its progress
+                            until the
+                            task is done! Observe, reason, act. Kind of like me falling down that fork rabbit hole. Oh!
+                            I really
+                            need to check if my neighbors bought more milk..."
+                        </blockquote>
 
-            <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
 
-            <h2>Adding the Living Memory</h2>
-            <p>To improve the Agent's long-term contextual memory, a <strong>Living_Memory.md</strong> file was created.
-                This file stores key points summarized directly by the Agent itself, rather than through a separate
-                summarization process.</p>
+                        <h2>Adding the Living Memory</h2>
+                        <p>To improve the Agent's long-term contextual memory, a <strong>Living_Memory.md</strong> file
+                            was created.
+                            This file stores key points summarized directly by the Agent itself, rather than through a
+                            separate
+                            summarization process.</p>
 
-            <p>The Agent achieves this by including specific tags in its responses: <strong>[CORE_UPDATE]</strong>,
-                <strong>[FUTURE_MESSAGE]</strong>, and <strong>[REPLY]</strong>. The collection of these self-tagged
-                lines within a single response forms the summary that is recorded—no separate summarizer runs; the
-                model's own tags are the summary.
-            </p>
+                        <p>The Agent achieves this by including specific tags in its responses:
+                            <strong>[CORE_UPDATE]</strong>,
+                            <strong>[FUTURE_MESSAGE]</strong>, and <strong>[REPLY]</strong>. The collection of these
+                            self-tagged
+                            lines within a single response forms the summary that is recorded—no separate summarizer
+                            runs; the
+                            model's own tags are the summary.
+                        </p>
 
-            <p><strong>Text added inside the prompt to achieve this:</strong></p>
+                        <p><strong>Text added inside the prompt to achieve this:</strong></p>
 
-            <ul>
-                <li>"After your [INTERNAL] thought, label this moment for your memory and then reply."</li>
-                <li>"[CORE_UPDATE]: in a few words, what this exchange was about (e.g. 'User shared information about
-                    X',
-                    'Quick check-in')."</li>
-                <li>"[FUTURE_MESSAGE]: one short line about what you're carrying forward — a follow-up, a thread, or
-                    'Nothing in particular'."</li>
-                <li>"[REPLY]: what you actually say to the user (this is the only part they see)."</li>
-                <li>"Format: [INTERNAL]:one short
-                    line\n[CORE_UPDATE]:label\n[FUTURE_MESSAGE]:carry-forward\n[REPLY]:your
-                    reply to User\n"</li>
-            </ul>
+                        <ul>
+                            <li>"After your [INTERNAL] thought, label this moment for your memory and then reply."</li>
+                            <li>"[CORE_UPDATE]: in a few words, what this exchange was about (e.g. 'User shared
+                                information about
+                                X',
+                                'Quick check-in')."</li>
+                            <li>"[FUTURE_MESSAGE]: one short line about what you're carrying forward — a follow-up, a
+                                thread, or
+                                'Nothing in particular'."</li>
+                            <li>"[REPLY]: what you actually say to the user (this is the only part they see)."</li>
+                            <li>"Format: [INTERNAL]:one short
+                                line\n[CORE_UPDATE]:label\n[FUTURE_MESSAGE]:carry-forward\n[REPLY]:your
+                                reply to User\n"</li>
+                        </ul>
 
-            <p>LLM responses are stored in a dictionary so tags can be used to reference and record the specific text
-                extracted from each response:</p>
+                        <p>LLM responses are stored in a dictionary so tags can be used to reference and record the
+                            specific text
+                            extracted from each response:</p>
 
-            <pre><code>res = self.parse_tags(res_content)</code></pre>
+                        <pre><code>res = self.parse_tags(res_content)</code></pre>
 
-            <p>The text from the tags can be isolated as follows:</p>
+                        <p>The text from the tags can be isolated as follows:</p>
 
-            <ul>
-                <li><code>res['CORE_UPDATE']</code></li>
-                <li><code>res['FUTURE_MESSAGE']</code></li>
-                <li><code>res['REPLY']</code></li>
-            </ul>
+                        <ul>
+                            <li><code>res['CORE_UPDATE']</code></li>
+                            <li><code>res['FUTURE_MESSAGE']</code></li>
+                            <li><code>res['REPLY']</code></li>
+                        </ul>
 
-            <p>That data is passed to a function that records it. The keys passed to <code>etch</code> match the labels
-                written to the file (<strong>CORE_UPDATE</strong>, <strong>FUTURE_MESSAGE</strong>,
-                <strong>REPLY</strong>) so the flat file contains exactly those three tagged lines per entry.
-            </p>
+                        <p>That data is passed to a function that records it. The keys passed to <code>etch</code> match
+                            the labels
+                            written to the file (<strong>CORE_UPDATE</strong>, <strong>FUTURE_MESSAGE</strong>,
+                            <strong>REPLY</strong>) so the flat file contains exactly those three tagged lines per
+                            entry.
+                        </p>
 
-            <pre><code>def witness(self, core_update, future_message, reply):
+                        <pre><code>def witness(self, core_update, future_message, reply):
     # This method is used to record tagged information
     self.etch({
         "CORE_UPDATE": core_update,
@@ -167,10 +217,11 @@ if __name__ == "__main__":
         "REPLY": reply,
     })</code></pre>
 
-            <p>A function called <strong>etch</strong> is used to record data to the <strong>Living_Memory.md</strong>
-                file:</p>
+                        <p>A function called <strong>etch</strong> is used to record data to the
+                            <strong>Living_Memory.md</strong>
+                            file:</p>
 
-            <pre><code>def etch(self, entry_data):
+                        <pre><code>def etch(self, entry_data):
     timestamp = datetime.datetime.now().strftime("%I:%M %p, %B %d, %Y")
     header = f"\n\n--- [PULSE: {timestamp}] ---\n"
     data_points = []
@@ -183,16 +234,17 @@ if __name__ == "__main__":
         f.write(header + body)
     print(f"\n[MEMORY]: A new memory forms. {timestamp}")</code></pre>
 
-            <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
 
-            <h2>Recall: Feeding Memory Into the Prompt</h2>
-            <p>The LLM uses the living memory by having it fed into the prompt through a function called
-                <strong>recall</strong>. This function returns the most recent 100 lines that have been recorded (the
-                tail
-                of the flat file).
-            </p>
+                        <h2>Recall: Feeding Memory Into the Prompt</h2>
+                        <p>The LLM uses the living memory by having it fed into the prompt through a function called
+                            <strong>recall</strong>. This function returns the most recent 100 lines that have been
+                            recorded (the
+                            tail
+                            of the flat file).
+                        </p>
 
-            <pre><code>def recall(self, query=""):
+                        <pre><code>def recall(self, query=""):
     """
     Return recent memory from the Living Memory flat file only.
     Returns the tail of the file for LLM context.
@@ -208,24 +260,31 @@ if __name__ == "__main__":
     except Exception:
         return "(Memory read error.)"</code></pre>
 
-            <p>The recall result is stored in a variable named <strong>context</strong>:</p>
+                        <p>The recall result is stored in a variable named <strong>context</strong>:</p>
 
-            <pre><code>context = self.memory.recall()</code></pre>
+                        <pre><code>context = self.memory.recall()</code></pre>
 
-            <p>By injecting this context into the prompt, the LLM is provided with the necessary data to improve its
-                conversational reference and adherence. The injection point in the system prompt looks like this:</p>
+                        <p>By injecting this context into the prompt, the LLM is provided with the necessary data to
+                            improve its
+                            conversational reference and adherence. The injection point in the system prompt looks like
+                            this:</p>
 
-            <pre><code>"Format: [INTERNAL]:one short line only\n[REPLY]:what you actually say to Amy (this is sent; everything for her goes here)\n"
+                        <pre><code>"Format: [INTERNAL]:one short line only\n[REPLY]:what you actually say to Amy (this is sent; everything for her goes here)\n"
 f"\n\nYOUR MEMORY:\n{context}"</code></pre>
 
-            <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
 
-            <h2>Outcome</h2>
-            <p>This approach improved the agent's performance in handling long-form conversations. It demonstrated a
-                better ability to recall "What Mattered"—the important details—leading to more thoughtful and meaningful
-                responses.</p>
+                        <h2>Outcome</h2>
+                        <p>This approach improved the agent's performance in handling long-form conversations. It
+                            demonstrated a
+                            better ability to recall "What Mattered"—the important details—leading to more thoughtful
+                            and meaningful
+                            responses.</p>
+                    </div>
+                </article>
+            </main>
         </div>
-    </article>
+    </div>
 
     <footer>
         <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
