@@ -10,11 +10,14 @@
   --title-bar: #b2b1ce;
   /* Muted lavender gray */
   --text-main: #000;
+  --text-secondary: #555;
   --link-color: #000080;
   /* Navy blue */
+  --accent-color: #ff33cc;
   --accent-pink: #ff33cc;
   --accent-yellow: #ffff00;
   --accent-green: #33ff33;
+  --surface-border: #ccc;
 }
 
 * {
