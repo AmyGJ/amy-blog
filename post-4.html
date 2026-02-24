@@ -41,7 +41,8 @@
                         <li><a href="post-2.html">Feb 22, 2026</a></li>
                         <li><a href="post-template.html">Feb 18, 2026</a></li>
                     </ul>
-                    <h3 style="margin-top: 1.5rem; font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                    <h3
+                        style="margin-top: 1.5rem; font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
                         LLM Build</h3>
                     <ul>
                         <li><a href="post-3.html">Feb 24, 2026</a></li>
@@ -74,12 +75,10 @@
                             changes.</p>
 
                         <ul>
-                            <li><strong>Tokenize</strong> – Turn text into token IDs (<code>tokenizer.py</code>:
-                                character-level for simplicity).</li>
-                            <li><strong>Embed</strong> – Map each ID to a vector (<code>model.py</code>:
-                                <code>nn.Embedding</code>).</li>
-                            <li><strong>Add positions</strong> – So the model knows order (learned position embeddings
-                                in <code>model.py</code>).</li>
+                            <li><strong>Tokenize</strong> – Turn text into token IDs.</li>
+                            <li><strong>Embed</strong> – Map each ID to a vector.</li>
+                            <li><strong>Add positions</strong> – So the model knows order (learned position embeddings).
+                            </li>
                             <li><strong>Transformer blocks</strong> – Each block has:
                                 <ul>
                                     <li><strong>Causal self-attention</strong> – Each position can only look at past
