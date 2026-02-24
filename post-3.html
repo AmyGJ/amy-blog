@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setting up a tokenizer : LLM BUILD | Amy Jerkovich</title>
+    <meta name="description" content="How to build a character-level tokenizer from scratch in Python for LLMs.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="os-bg-stars"></div>
+    <div class="os-window fade-up">
+        <div class="os-title-bar">
+            <div class="os-title-left">
+                <div class="os-buttons"><span></span><span></span><span></span></div>
+                <div class="os-title">C:\AMY\BLOG.EXE</div>
+            </div>
+            <div class="os-controls"><span>_</span><span>☐</span><span>X</span></div>
+        </div>
+
+        <div class="os-body">
+            <aside class="os-sidebar">
+                <div class="os-profile">
+                    <img src="assets/profile.jpg" alt="Amy">
+                </div>
+                <!-- Nav Links -->
+                <div class="nav-links">
+                    <a href="index.html" class="active">Posts</a>
+                    <a href="about.html">About</a>
+                </div>
+                <div class="date-index">
+                    <h3 style="margin-top: 2rem; font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                        Timeline</h3>
+                    <ul>
+                        <li><a href="post-3.html">Feb 24, 2026</a></li>
+                        <li><a href="post-2.html">Feb 22, 2026</a></li>
+                        <li><a href="post-template.html">Feb 18, 2026</a></li>
+                    </ul>
+                </div>
+                <div class="rainbow-bar"></div>
+            </aside>
+
+            <main class="os-content">
+                <article class="post-container">
+                    <header class="post-header fade-up">
+                        <div
+                            style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                            LLM BUILD</div>
+                        <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Setting up a tokenizer
+                        </h1>
+                        <p
+                            style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; max-width: 800px; margin-inline: auto;">
+                            An LLM never sees text; only integers. Its inputs and outputs are all represented as
+                            sequences of token IDs (e.g., [7, 4, 10, 10, 12]). This is why we use a tokenizer to convert
+                            strings of text into number IDs.</p>
+
+                    </header>
+
+                    <div class="post-content fade-up delay-1">
+                        <p>A tokenizer works as a bridge that converts strings to IDs on the way in, and then converts
+                            them back to string characters on the way out.</p>
+
+                        <ul>
+                            <li><strong>Going in:</strong> Turn text into IDs so the model can process it (encode).</li>
+                            <li><strong>Going out:</strong> Turn the model's predicted IDs back into text so humans can
+                                read it (decode).</li>
+                        </ul>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+
+                        <h2>Code:</h2>
+
+                        <p>We take a string of text and split the text into individual characters, removing any
+                            duplicates. Then we sort the remaining characters into alphabetical order.</p>
+
+                        <p>We do this when building a tokenizer to create a vocabulary; we want a list of every
+                            character that can appear mapped to a unique ID.</p>
+
+                        <p>Sorting the characters creates a stable order, so the same text always creates the same
+                            vocabulary.</p>
+
+                        <pre><code>chars = sorted(set(text))</code></pre>
+
+                        <p>Here we are building dictionaries that map each character to a unique integer. By doing so,
+                            we're able to create a unique array of numbers for every word. The array of numbers is what
+                            we call a vector.</p>
+
+                        <pre><code>self.stoi = {ch: i for i, ch in enumerate(chars)}
+self.itos = {i: ch for i, ch in enumerate(chars)}</code></pre>
+
+                        <p>Encoding is what takes the dictionary and converts it into the list of unique numbers. For
+                            the word "Hello," for example, and a vocabulary where 'h'→7, 'e'→4, 'l'→10, 'o'→12, you get
+                            <code>[7, 4, 10, 10, 12]</code>.</p>
+
+                        <pre><code>def encode(self, text: str) -> list[int]:
+    return [self.stoi[c] for c in text if c in self.stoi]</code></pre>
+
+                        <p>The decoder takes the array of numbers and converts it back into text.</p>
+
+                        <pre><code>def decode(self, ids: list[int]) -> str:
+    return "".join(self.itos[i] for i in ids if i in self.itos)</code></pre>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+
+                        <h2>Full Code Sample:</h2>
+
+                        <pre><code>class CharTokenizer:
+    def __init__(self, text: str):
+        chars = sorted(set(text))
+        self.vocab_size = len(chars)
+        self.stoi = {ch: i for i, ch in enumerate(chars)}
+        self.itos = {i: ch for i, ch in enumerate(chars)}
+
+    def encode(self, text: str) -> list[int]:
+        return [self.stoi[c] for c in text if c in self.stoi]
+
+    def decode(self, ids: list[int]) -> str:
+        return "".join(self.itos[i] for i in ids if i in self.itos)</code></pre>
+
+                        <p>And that's how you build a tokenizer.</p>
+
+                    </div>
+                </article>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
