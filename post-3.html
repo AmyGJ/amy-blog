@@ -37,6 +37,7 @@
                         Timeline</h3>
                     <ul>
                         <li><a href="post-3.html">Feb 24, 2026</a></li>
+                        <li><a href="post-4.html">Feb 23, 2026</a></li>
                         <li><a href="post-2.html">Feb 22, 2026</a></li>
                         <li><a href="post-template.html">Feb 18, 2026</a></li>
                     </ul>
@@ -57,9 +58,7 @@
                             An LLM never sees text; only integers. Its inputs and outputs are all represented as
                             sequences of token IDs (e.g., [7, 4, 10, 10, 12]). This is why we use a tokenizer to convert
                             strings of text into number IDs.</p>
-
                     </header>
-
                     <div class="post-content fade-up delay-1">
                         <p>A tokenizer works as a bridge that converts strings to IDs on the way in, and then converts
                             them back to string characters on the way out.</p>
@@ -70,7 +69,6 @@
                             <li><strong>Going out:</strong> Turn the model's predicted IDs back into text so humans can
                                 read it (decode).</li>
                         </ul>
-
                         <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
                         <p>We take a string of text and split the text into individual characters, removing any
                             duplicates. Then we sort the remaining characters into alphabetical order.</p>
@@ -102,7 +100,6 @@ self.itos = {i: ch for i, ch in enumerate(chars)}</code></pre>
 
                         <pre><code>def decode(self, ids: list[int]) -> str:
     return "".join(self.itos[i] for i in ids if i in self.itos)</code></pre>
-
                         <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
                         <h2>Full Code Sample:</h2>
 
