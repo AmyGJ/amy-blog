@@ -49,7 +49,7 @@
                     <header class="post-header fade-up">
                         <div
                             style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
-                            LLM BUILD</div>
+                            SETTING UP AT TOKENIZER: LLM BUILD</div>
                         <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Setting up a tokenizer
                         </h1>
                         <p
@@ -71,9 +71,6 @@
                         </ul>
 
                         <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
-
-                        <h2>Code:</h2>
-
                         <p>We take a string of text and split the text into individual characters, removing any
                             duplicates. Then we sort the remaining characters into alphabetical order.</p>
 
@@ -94,7 +91,8 @@ self.itos = {i: ch for i, ch in enumerate(chars)}</code></pre>
 
                         <p>Encoding is what takes the dictionary and converts it into the list of unique numbers. For
                             the word "Hello," for example, and a vocabulary where 'h'→7, 'e'→4, 'l'→10, 'o'→12, you get
-                            <code>[7, 4, 10, 10, 12]</code>.</p>
+                            <code>[7, 4, 10, 10, 12]</code>.
+                        </p>
 
                         <pre><code>def encode(self, text: str) -> list[int]:
     return [self.stoi[c] for c in text if c in self.stoi]</code></pre>
