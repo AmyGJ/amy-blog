@@ -49,7 +49,7 @@
                     <header class="post-header fade-up">
                         <div
                             style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
-                            SETTING UP AT TOKENIZER: LLM BUILD</div>
+                            SETTING UP A TOKENIZER: LLM BUILD</div>
                         <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Setting up a tokenizer
                         </h1>
                         <p
@@ -63,6 +63,7 @@
                     <div class="post-content fade-up delay-1">
                         <p>A tokenizer works as a bridge that converts strings to IDs on the way in, and then converts
                             them back to string characters on the way out.</p>
+
 
                         <ul>
                             <li><strong>Going in:</strong> Turn text into IDs so the model can process it (encode).</li>
@@ -103,7 +104,6 @@ self.itos = {i: ch for i, ch in enumerate(chars)}</code></pre>
     return "".join(self.itos[i] for i in ids if i in self.itos)</code></pre>
 
                         <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
-
                         <h2>Full Code Sample:</h2>
 
                         <pre><code>class CharTokenizer:
@@ -118,8 +118,6 @@ self.itos = {i: ch for i, ch in enumerate(chars)}</code></pre>
 
     def decode(self, ids: list[int]) -> str:
         return "".join(self.itos[i] for i in ids if i in self.itos)</code></pre>
-
-                        <p>And that's how you build a tokenizer.</p>
 
                     </div>
                 </article>
