@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyTorch For Training Neural Networks : LLM Build | Amy Jerkovich</title>
+    <meta name="description"
+        content="What PyTorch actually gives you — tensors, layers, automatic gradients, and optimizers — explained plainly.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="os-bg-stars"></div>
+    <div class="os-window fade-up">
+        <div class="os-title-bar">
+            <div class="os-title-left">
+                <div class="os-buttons"><span></span><span></span><span></span></div>
+                <div class="os-title">C:\AMY\BLOG.EXE</div>
+            </div>
+            <div class="os-controls"><span>_</span><span>☐</span><span>X</span></div>
+        </div>
+
+        <div class="os-body">
+            <aside class="os-sidebar">
+                <div class="os-profile">
+                    <img src="assets/profile.jpg" alt="Amy">
+                </div>
+                <!-- Nav Links -->
+                <div class="nav-links">
+                    <a href="index.html" class="active">Posts</a>
+                    <a href="about.html">About</a>
+                </div>
+                <div class="date-index">
+                    <h3 style="margin-top: 2rem; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-main);">
+                        Projects</h3>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                        Milo</h3>
+                    <ul>
+                        <li><a href="post-2.html">Feb 22, 2026</a></li>
+                        <li><a href="post-template.html">Feb 18, 2026</a></li>
+                    </ul>
+                    <h3
+                        style="margin-top: 1.5rem; font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                        LLM Build</h3>
+                    <ul>
+                        <li><a href="post-5.html">Feb 25, 2026</a></li>
+                        <li><a href="post-3.html">Feb 24, 2026</a></li>
+                        <li><a href="post-4.html">Feb 23, 2026</a></li>
+                    </ul>
+                </div>
+                <div class="rainbow-bar"></div>
+            </aside>
+
+            <main class="os-content">
+                <article class="post-container">
+                    <header class="post-header fade-up">
+                        <div
+                            style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                            PYTORCH FOR TRAINING NEURAL NETWORKS: LLM BUILD</div>
+                        <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">PyTorch For Training
+                            Neural Networks
+                        </h1>
+                    </header>
+                    <div class="post-content fade-up delay-1">
+                        <p>For training my model, I used a Python library called PyTorch. PyTorch is a library that
+                            lets you build neural networks out of basic math operations (on arrays of numbers). PyTorch
+                            gives you Tensors, Layers, Automatic Gradients, and Optimizers.</p>
+
+                        <p>Here is a breakdown of what those actually are:</p>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <h2>Tensor</h2>
+                        <p>A tensor is an array type that PyTorch uses for basically everything. A tensor is a
+                            multi-dimensional array of numbers. It's what holds all of your model's 'data' (like the
+                            weights, vectors, token ID's, etc.).</p>
+
+                        <p>Each of your model's weights is stored in a vector, but not every tensor is a weight. A batch
+                            of token ID's is a tensor, for example.</p>
+
+                        <p><strong>1D tensor</strong> (a list of numbers):</p>
+                        <pre><code>tensor([ 0.1,  -0.3,   0.5,   0.0,  -0.2 ])</code></pre>
+
+                        <p><strong>2D tensor</strong> (a grid/table):</p>
+                        <pre><code>tensor([[ 1,  2,  3 ],
+        [ 4,  5,  6 ],
+        [ 7,  8,  9 ]])</code></pre>
+
+                        <blockquote
+                            style="border-left: 4px solid var(--accent-color); padding-left: 1rem; margin-left: 0; color: var(--text-secondary); font-style: italic;">
+                            <strong>What are a model's "weights"?</strong><br><br>
+                            A model's weights are the only thing that changes when you train it. Weights define one big,
+                            complex math recipe that is adjusted when the model gets an answer to a question right or
+                            wrong. After a lot of time, the more the model is trained, the weights adjust to be better
+                            and better. There is no "memory" of past questions, just a recipe of numbers and math that
+                            gives you the correct answer to your question.
+                        </blockquote>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <h2>Layers</h2>
+                        <p><strong>Fixed math (the operation)</strong> — e.g., "multiply input by a matrix, add a
+                            vector," or "take max(0, x)," etc. That part doesn't change.</p>
+
+                        <p><strong>Weights</strong> — the numbers (matrix, bias, etc.) that the math uses. Those are
+                            what training updates.</p>
+
+                        <p>So: a layer = a fixed operation + the weights it uses. The operation is the recipe; the
+                            weights are the learned numbers inside it.</p>
+
+                        <p>One layer = one step: "take input, do this math with my weights, return output."</p>
+
+                        <p><strong>What is the operation used for training?</strong><br>
+                            The operation is fixed math whose result is included in a layer. It multiplies the input by
+                            the matrix, then adds the vector.</p>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <h2>Automatic Gradients</h2>
+                        <p>How much loss goes up or down and by how much is called the gradient of the loss that's
+                            applied to the weight. So you always need one gradient per parameter, as this is what
+                            informs
+                            the adjustments of the weights.</p>
+
+                        <p>Automatic gradients are what compute the gradients for you.</p>
+
+                        <blockquote
+                            style="border-left: 4px solid var(--accent-color); padding-left: 1rem; margin-left: 0; color: var(--text-secondary); font-style: italic;">
+                            <strong>When we talk about loss in training, what does it mean? What is
+                                loss?</strong><br><br>
+                            Loss is a single number that measures how wrong a model's predictions are. The lower the
+                            number, the closer the model is to getting the answer correct. The higher the number, the
+                            further away it was. Over the course of the training, we hope to see the loss number
+                            decrease.<br><br>
+                            Training tries to continuously lower the loss number by updating the weights.
+                        </blockquote>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <h2>Optimizer</h2>
+                        <p>An optimizer is what takes your gradients and actually updates your weights.</p>
+
+                    </div>
+                </article>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
