@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TELEGRAM : MILO | Amy Jerkovich</title>
+    <meta name="description"
+        content="How I set up Telegram as the communication layer for my autonomous AI agent Milo using BotFather and pyTelegramBotAPI.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="os-bg-stars"></div>
+    <div class="os-window fade-up">
+        <div class="os-title-bar">
+            <div class="os-title-left">
+                <div class="os-buttons"><span></span><span></span><span></span></div>
+                <div class="os-title">C:\AMY\BLOG.EXE</div>
+            </div>
+            <div class="os-controls"><span>_</span><span>☐</span><span>X</span></div>
+        </div>
+
+        <div class="os-body">
+            <aside class="os-sidebar">
+                <div class="os-profile">
+                    <img src="assets/profile.jpg" alt="Amy">
+                </div>
+                <!-- Nav Links -->
+                <div class="nav-links">
+                    <a href="index.html" class="active">Posts</a>
+                    <a href="about.html">About</a>
+                </div>
+                <div class="date-index">
+                    <h3 style="margin-top: 2rem; font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-main);">
+                        Projects</h3>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                        Milo</h3>
+                    <ul>
+                        <li><a href="post-6.html">Feb 28, 2026</a></li>
+                        <li><a href="post-2.html">Feb 22, 2026</a></li>
+                        <li><a href="post-template.html">Feb 18, 2026</a></li>
+                    </ul>
+                    <h3
+                        style="margin-top: 1.5rem; font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-secondary);">
+                        LLM Build</h3>
+                    <ul>
+                        <li><a href="post-5.html">Feb 25, 2026</a></li>
+                        <li><a href="post-3.html">Feb 24, 2026</a></li>
+                        <li><a href="post-4.html">Feb 23, 2026</a></li>
+                    </ul>
+                </div>
+                <div class="rainbow-bar"></div>
+            </aside>
+
+            <main class="os-content">
+                <article class="post-container">
+                    <header class="post-header fade-up">
+                        <div
+                            style="color: var(--accent-color); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">
+                            TELEGRAM : MILO</div>
+                        <h1 class="post-title" style="font-size: clamp(2.5rem, 4vw, 3.5rem);">Telegram for Agent
+                            Communication
+                        </h1>
+                    </header>
+                    <div class="post-content fade-up delay-1">
+                        <p>I wanted a way to easily communicate with my agent from my phone; the easiest way to do this
+                            was via Telegram. Telegram also has a desktop application, which makes it easy to chat with
+                            on your computer.</p>
+
+                        <p>Telegram has an official bot manager service called BotFather. BotFather is a first-party
+                            Telegram service that provides a single place to create and manage bots on Telegram. When
+                            you
+                            open Telegram, you search for @BotFather and give the command <code>/newbot</code> in the
+                            chat. BotFather will ask for a name for your bot, which you respond with, and just like
+                            that,
+                            you'll be issued an API token for your bot.</p>
+
+                        <p>In order to use your API token within your code, you'll need to download the
+                            pyTelegramBotAPI.</p>
+
+                        <pre><code>pip install pyTelegramBotAPI</code></pre>
+
+                        <p>Once you've saved your API token to your <code>.env</code> you import telebot in your
+                            <code>.py</code> file then initialize your bot.
+                        </p>
+
+                        <pre><code>import telebot
+
+self.bot = telebot.TeleBot(self.token)</code></pre>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <h2>Processing Telegram Messages</h2>
+                        <p>When text is received, it's given to the LLM as input through a function called
+                            <code>process_signal()</code>. <code>_build_signal_prompts()</code> takes the message from
+                            the user and returns two strings: <code>system_prompt</code> and <code>human_content</code>.
+                            <code>system_prompt</code> and <code>human_content</code> are then given to
+                            <code>_invoke_signal_llm_and_parse()</code>. <code>_apply_parsed_response_tags()</code>
+                            completes the processing of the user's message and sends the response to the user.
+                        </p>
+
+                        <pre><code>def process_signal(self, sender, subject, body):
+    """Minimal: build prompts, invoke LLM, apply tags and send reply."""
+    context = "(No memory yet.)"  # or "" if your prompt handles empty context
+    system_prompt, human_content = self._build_signal_prompts(body, sender, context)
+
+    try:
+        res, res_content = self._invoke_signal_llm_and_parse(system_prompt, human_content, sender, body)
+        self._apply_parsed_response_tags(res, sender, subject, body, None)  # no resonance
+    except Exception as e:
+        self.log(f"Signal processing error: {e}")
+        if "Telegram" in sender:
+            try:
+                self.dispatch_as_human("Connection glitch — try again in a sec? 🦞")
+            except Exception:
+                pass</code></pre>
+
+                        <hr style="border: 0; border-top: 1px solid var(--surface-border); margin: 3rem 0;">
+                        <h2>Checking Messages in Telegram</h2>
+                        <p>I set up a function called <code>check_telegram()</code> that runs every 5 seconds, checking
+                            for new messages.</p>
+
+                        <p>There was an issue at one point where I was getting double messages due to some latency that
+                            would result in two instances of <code>check_telegram()</code> running at the same time. I
+                            resolved this by adding a True or False boolean. When <code>check_telegram()</code> runs, it
+                            checks if <code>is_running</code> is True; if so, it does not execute. If
+                            <code>is_running</code> is False, it changes to True and runs the
+                            <code>check_telegram()</code> function.
+                        </p>
+
+                        <p>Every time a message is received from Telegram, it is assigned an ID by Telegram that you
+                            receive via the API. After processing the message, the ID is added to
+                            <code>last_tg_update_id.txt</code>. When a message is received from Telegram for processing,
+                            the ID is checked against the <code>last_tg_update_id.txt</code> file, and if the ID already
+                            exists, the message is not sent to the user.
+                        </p>
+
+                        <p><code>_get_telegram_poll_offset()</code> reads the last ID number that was saved in
+                            <code>last_tg_update_id.txt</code> so you're only given messages after that number.
+                            <code>_fetch_telegram_updates()</code> is what fetches the latest batch of messages
+                            following
+                            the highest number recorded. After messages are received,
+                            <code>_mark_telegram_updates_seen()</code> records the highest number so once again you can
+                            ask for only messages after that ID when the conversation continues.
+                        </p>
+
+                        <p><code>_process_telegram_update()</code> is what checks and validates the incoming message,
+                            e.g., is the message text or an image? Is the message coming from a verified chat? If the
+                            message was invalid, e.g., came from an unverified source, it would be ignored.</p>
+
+                        <pre><code>def check_telegram(self):
+    if self.is_checking_tg:
+        return
+    self.is_checking_tg = True
+    self.log("Checking Telegram updates...")
+    try:
+        offset = self._get_telegram_poll_offset()
+        updates = self._fetch_telegram_updates(offset)
+        if updates is None:
+            return
+        if updates:
+            self.log(f"Updates found: {len(updates)}")
+            self._mark_telegram_updates_seen(updates)
+            for u in updates:
+                self._process_telegram_update(u)
+    except Exception as e:
+        self.log(f"Telegram error: {e}")
+    finally:
+        self.is_checking_tg = False</code></pre>
+
+                    </div>
+                </article>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Amy Jerkovich. Built with ❤️ and AI.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
